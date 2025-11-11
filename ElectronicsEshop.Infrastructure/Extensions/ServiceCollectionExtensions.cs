@@ -1,6 +1,8 @@
 ﻿using ElectronicsEshop.Domain.Entities;
+using ElectronicsEshop.Domain.RepositoryInterfaces;
 using ElectronicsEshop.Infrastructure.Database;
 using ElectronicsEshop.Infrastructure.Options;
+using ElectronicsEshop.Infrastructure.Repositories;
 using ElectronicsEshop.Infrastructure.Security;
 using ElectronicsEshop.Infrastructure.Seeders;
 using Microsoft.AspNetCore.Identity;
@@ -44,6 +46,8 @@ public static class ServiceCollectionExtensions
         services.AddAuthorization();
 
         services.AddScoped<IDefaultDataSeeder, DefaultDataSeeder>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
 
         return services;
     }

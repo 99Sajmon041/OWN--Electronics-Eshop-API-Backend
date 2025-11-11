@@ -1,5 +1,6 @@
 ﻿using ElectronicsEshop.Application.User;
 using Microsoft.Extensions.DependencyInjection;
+using FluentValidation;
 
 namespace ElectronicsEshop.Application.Extensions;
 
@@ -7,9 +8,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        var applicationAssembly = typeof(ServiceCollectionExtensions).Assembly;
-
-        //services.AddMediaR(cfg => cfg.RegisterServicesFromAssembly(applicationAssembly));
+        var assembly = typeof(ServiceCollectionExtensions).Assembly;
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
+        services.AddValidatorsFromAssembly(assembly);
 
         services.AddScoped<IUserContext, UserContext>();
         services.AddHttpContextAccessor();

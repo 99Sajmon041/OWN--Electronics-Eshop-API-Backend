@@ -9,22 +9,44 @@ public sealed class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> log
     {
         try
         {
-            await next.Invoke(context);
+            await next(context);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unhandled exception ({TraceId})", context.TraceIdentifier);
+            ProblemDetails problem;
 
-            var problem = ex switch
+            switch (ex)
             {
-                ValidationException v => Create(400, "Validation Failed", v.Message, context, v.Errors),
-                NotFoundException => Create(404, "Not Found", ex.Message, context),
-                ForbiddenException => Create(403, "Forbidden", ex.Message, context),
-                UnauthorizedException => Create(401, "Unauthorized", ex.Message, context),
-                ConflictException => Create(409, "Conflict", ex.Message, context),
-                DomainException => Create(409, "Domain Error", ex.Message, context),
-                _ => Create(500, "Server Error", "An unexpected error occurred.", context)
-            };
+                case NotFoundException:
+                    logger.LogWarning("Not Found ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                    problem = Create(404, "Not Found", ex.Message, context);
+                    break;
+
+                case ConflictException:
+                    logger.LogWarning("Conflict ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                    problem = Create(409, "Conflict", ex.Message, context);
+                    break;
+
+                case ForbiddenException:
+                    logger.LogWarning("Forbidden ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                    problem = Create(403, "Forbidden", ex.Message, context);
+                    break;
+
+                case UnauthorizedException:
+                    logger.LogWarning("Unauthorized ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                    problem = Create(401, "Unauthorized", ex.Message, context);
+                    break;
+
+                case DomainException:
+                    logger.LogWarning("Domain Error ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                    problem = Create(409, "Domain Error", ex.Message, context);
+                    break;
+
+                default:
+                    logger.LogError(ex, "Unhandled exception ({TraceId})", context.TraceIdentifier);
+                    problem = Create(500, "Server Error", "An unexpected error occurred.", context);
+                    break;
+            }
 
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = problem.Status ?? StatusCodes.Status500InternalServerError;
@@ -44,7 +66,6 @@ public sealed class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> log
         };
         problem.Extensions["traceId"] = ctx.TraceIdentifier;
         if (errors is not null) problem.Extensions["errors"] = errors;
-
         return problem;
     }
 }

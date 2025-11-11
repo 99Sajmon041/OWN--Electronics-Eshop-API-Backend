@@ -1,9 +1,12 @@
 ﻿using ElectronicsEshop.API.Extensions;
 using ElectronicsEshop.API.Middlewares;
 using ElectronicsEshop.Application.Extensions;
+using ElectronicsEshop.Application.Products.Mapping;
 using ElectronicsEshop.Domain.Entities;
 using ElectronicsEshop.Infrastructure.Extensions;
 using ElectronicsEshop.Infrastructure.Seeders;
+using FluentValidation.AspNetCore;
+using MediatR;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,10 +20,14 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+builder.Services.AddAutoMapper(cfg => { }, typeof(ProductMappingProfile).Assembly);
 
 builder.AddPresentation();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
 
 builder.Services.AddTransient<ErrorHandlingMiddleware>();
 builder.Services.AddTransient<UserLogEnricherMiddleware>();

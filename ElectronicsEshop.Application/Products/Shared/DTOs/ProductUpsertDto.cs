@@ -1,17 +1,14 @@
-﻿namespace ElectronicsEshop.Domain.Entities;
+﻿namespace ElectronicsEshop.Application.Products.Shared.DTOs;
 
-public class Product
+public sealed class ProductUpsertDto
 {
-    public int Id { get; set; }
     public string ProductCode { get; set; } = default!;
     public bool IsActive { get; set; }
     public string Name { get; set; } = default!;
     public string Description { get; set; } = default!;
-    public Category Category { get; set; } = default!;
     public int CategoryId { get; set; }
     public decimal Price { get; set; }
     public decimal DiscountPercentage { get; set; }
     public int StockQty { get; set; }
     public string ImageUrl { get; set; } = default!;
 }
-

@@ -1,12 +1,16 @@
 ﻿using ElectronicsEshop.Application.Common.Pagination;
 using ElectronicsEshop.Application.Products.Commands.CreateProduct;
 using ElectronicsEshop.Application.Products.Commands.DeleteProduct;
+using ElectronicsEshop.Application.Products.Commands.SetProductState;
 using ElectronicsEshop.Application.Products.Commands.UpdateProduct;
+using ElectronicsEshop.Application.Products.Commands.UpdateProductDiscount;
+using ElectronicsEshop.Application.Products.Commands.UpdateProductsStockQty;
 using ElectronicsEshop.Application.Products.DTOs;
 using ElectronicsEshop.Application.Products.Queries.GetProduct;
 using ElectronicsEshop.Application.Products.Queries.GetProducts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace ElectronicsEshop.API.Controllers;
 
@@ -59,6 +63,39 @@ public class ProductsController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken ct)
     {
         await mediator.Send(new DeleteProductCommand(id), ct);
+        return NoContent();
+    }
+
+    [HttpPatch("{id}/discount")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateDiscount([FromRoute] int id, [FromBody] UpdateProductDiscountCommand command, CancellationToken ct)
+    {
+        command.Id = id;
+        await mediator.Send(command, ct);
+        return NoContent();
+    }
+
+    [HttpPatch("{id}/stock-qty")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateStockQty([FromRoute] int id, [FromBody] UpdateProductsStockQtyCommand command, CancellationToken ct)
+    {
+        command.Id = id;
+        await mediator.Send(command, ct);
+        return NoContent();
+    }
+
+    [HttpPatch("{id}/active")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateProductsState([FromRoute] int id, [FromBody] SetProductStateCommand command, CancellationToken ct)
+    {
+        command.Id = id;
+        await mediator.Send(command, ct);
         return NoContent();
     }
 }

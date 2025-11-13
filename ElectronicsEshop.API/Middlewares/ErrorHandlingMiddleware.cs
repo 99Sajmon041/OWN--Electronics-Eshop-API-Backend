@@ -17,43 +17,43 @@ public sealed class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> log
         {
             ProblemDetails problem;
 
-            if(ex is DbUpdateException dbEx && IsForeignKeyConflict(dbEx))
+            if (ex is DbUpdateException dbEx && IsForeignKeyConflict(dbEx))
             {
-                logger.LogWarning("Conflict (FK) ({TraceId}): {Message}", context.TraceIdentifier, dbEx.Message);
-                problem = Create(409, "Conflict", "Entity is referenced and cannot be deleted.", context);
+                logger.LogWarning("Konflikt (FK) ({TraceId}): {Message}", context.TraceIdentifier, dbEx.Message);
+                problem = Create(409, "Konflikt dat", "Entita je referencována v jiné tabulce a nelze ji odstranit.", context);
             }
             else switch (ex)
-            {
-                case NotFoundException:
-                    logger.LogWarning("Not Found ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
-                    problem = Create(404, "Not Found", ex.Message, context);
-                    break;
+                {
+                    case NotFoundException:
+                        logger.LogWarning("Nenalezeno ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                        problem = Create(404, "Nenalezeno", ex.Message, context);
+                        break;
 
-                case ConflictException:
-                    logger.LogWarning("Conflict ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
-                    problem = Create(409, "Conflict", ex.Message, context);
-                    break;
+                    case ConflictException:
+                        logger.LogWarning("Konflikt ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                        problem = Create(409, "Konflikt", ex.Message, context);
+                        break;
 
-                case ForbiddenException:
-                    logger.LogWarning("Forbidden ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
-                    problem = Create(403, "Forbidden", ex.Message, context);
-                    break;
+                    case ForbiddenException:
+                        logger.LogWarning("Zakázáno ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                        problem = Create(403, "Zakázáno", ex.Message, context);
+                        break;
 
-                case UnauthorizedException:
-                    logger.LogWarning("Unauthorized ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
-                    problem = Create(401, "Unauthorized", ex.Message, context);
-                    break;
+                    case UnauthorizedException:
+                        logger.LogWarning("Neautorizováno ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                        problem = Create(401, "Neautorizováno", ex.Message, context);
+                        break;
 
-                case DomainException:
-                    logger.LogWarning("Domain Error ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
-                    problem = Create(409, "Domain Error", ex.Message, context);
-                    break;
+                    case DomainException:
+                        logger.LogWarning("Chyba domény ({TraceId}): {Message}", context.TraceIdentifier, ex.Message);
+                        problem = Create(409, "Chyba domény", ex.Message, context);
+                        break;
 
-                default:
-                    logger.LogError(ex, "Unhandled exception ({TraceId})", context.TraceIdentifier);
-                    problem = Create(500, "Server Error", "An unexpected error occurred.", context);
-                    break;
-            }
+                    default:
+                        logger.LogError(ex, "Nezpracovaná výjimka ({TraceId})", context.TraceIdentifier);
+                        problem = Create(500, "Chyba serveru", "Došlo k neočekávané chybě na serveru.", context);
+                        break;
+                }
 
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = problem.Status ?? StatusCodes.Status500InternalServerError;

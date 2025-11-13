@@ -14,4 +14,7 @@ public interface IProductRepository
     Task<bool> ExistsByProductCodeAsync(string productCode, CancellationToken ct);
     Task<Product?> GetByProductCodeAsync(string productCode, CancellationToken ct);
     Task<Product?> GetByIdAsync(int id, CancellationToken ct);
+    Task UpdateDiscountAsync(Product product, decimal value, CancellationToken ct);
+    Task AddStockQtyAsync(Product product, int amount, CancellationToken ct);
+    Task SetStateOfProductAsync(Product product, bool isActive, CancellationToken ct);
 }

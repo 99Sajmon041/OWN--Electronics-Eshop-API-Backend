@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElectronicsEshop.Infrastructure.Repositories;
 
-public class CategoryRepository(AppDbContext context) : ICategoryRepository
+public sealed class CategoryRepository(AppDbContext context) : ICategoryRepository
 {
     public async Task<bool> Exists(int id, CancellationToken ct = default)
     {

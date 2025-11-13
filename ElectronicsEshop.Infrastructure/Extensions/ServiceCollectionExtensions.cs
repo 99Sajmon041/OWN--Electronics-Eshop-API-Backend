@@ -48,6 +48,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDefaultDataSeeder, DefaultDataSeeder>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+        services.AddScoped<ICartItemRepository, CartItemRepository>();
 
         return services;
     }

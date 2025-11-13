@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElectronicsEshop.Infrastructure.Repositories;
 
-public class ProductRepository(AppDbContext db) : IProductRepository
+public sealed class ProductRepository(AppDbContext db) : IProductRepository
 {
     public async Task<(IReadOnlyList<Product> Items, int totalCount)> GetPagedAsync(
         int page, int pageSize, string? sort,
@@ -102,5 +102,23 @@ public class ProductRepository(AppDbContext db) : IProductRepository
     public async Task<Product?> GetByIdAsync(int id, CancellationToken ct)
     {
         return await db.Products.FirstOrDefaultAsync(p => p.Id == id, ct);
+    }
+
+    public async Task UpdateDiscountAsync(Product product, decimal value, CancellationToken ct)
+    {
+        product.DiscountPercentage = value;
+        await db.SaveChangesAsync(ct);
+    }
+
+    public async Task AddStockQtyAsync(Product product, int amount, CancellationToken ct)
+    {
+        product.StockQty += amount;
+        await db.SaveChangesAsync(ct);
+    }
+
+    public async Task SetStateOfProductAsync(Product product, bool isActive, CancellationToken ct)
+    {
+        product.IsActive = isActive;
+        await db.SaveChangesAsync(ct);
     }
 }
